@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ekonomisk Jämförelsemodell med Delningslänk</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --success: #16a34a;
+            --danger: #dc2626;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background);
+            color: var(--text);
+            padding: 2rem 1rem;
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        header h1 {
+            color: #0f172a;
+            font-size: 2.25rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Delningssektion */
+        .share-section {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .share-url {
+            flex: 1;
+            padding: 0.5rem;
+            background: #fff;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            min-width: 250px;
+        }
+
+        .btn-share {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.25rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        .btn-share:hover {
+            background: #1d4ed8;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        @media (min-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .option-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            border: 1px solid var(--border);
+        }
+
+        .option-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .category-box {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .category-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            color: #334155;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .insurance-row {
+            position: relative;
+            padding-right: 2rem;
+        }
+
+        .btn-delete {
+            position: absolute;
+            right: 0;
+            top: 24px;
+            background: none;
+            border: none;
+            color: var(--danger);
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            color: #64748b;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+
+        input:focus {
+            outline: 2px solid var(--primary);
+        }
+
+        .btn-add {
+            background: #cbd5e1;
+            border: none;
+            padding: 0.25rem 0.7rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .btn-add:hover {
+            background: #94a3b8;
+        }
+
+        .sub-result {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #475569;
+            text-align: right;
+            margin-top: 0.5rem;
+            background: #e2e8f0;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            float: right;
+        }
+
+        .clearfix::after {
+            content: "";
+            clear: both;
+            display: table;
+        }
+
+        .summary-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            border: 1px solid var(--border);
+        }
+
+        .summary-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .visual-bar-container {
+            margin: 2rem 0;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .bar-bg {
+            background: #e2e8f0;
+            height: 24px;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease-out, background-color 0.3s;
+            border-radius: 12px;
+        }
+
+        .result-box {
+            text-align: center;
+            font-size: 1.25rem;
+            font-weight: 600;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .winner {
+            background-color: #dcfce7;
+            color: #14532d;
+            border: 1px solid #bbf7d0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Ekonomisk Jämförelsemodell</h1>
+        <p>Justera värdena. Länken uppdateras automatiskt i realtid så att du kan kopiera och dela den direkt.</p>
+    </header>
+
+    <!-- Delningslänk fält -->
+    <div class="share-section">
+        <span>🔗 <strong>Din unika delningslänk:</strong></span>
+        <div id="share-url" class="share-url">Skapar länk...</div>
+        <button class="btn-share" onclick="copyShareUrl()">Kopiera länk</button>
+    </div>
+
+    <div class="grid">
+        <!-- ALTERNATIV 1 -->
+        <div class="option-card" id="opt1">
+            <div class="option-title">Alternativ 1</div>
+            
+            <!-- Bank -->
+            <div class="category-box clearfix">
+                <div class="category-title">🏦 Bank</div>
+                <div class="form-row">
+                    <div>
+                        <label>Summa lån (kr)</label>
+                        <input type="number" class="bank-loan" value="3000000" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label>Räntesats (%)</label>
+                        <input type="number" class="bank-rate" step="0.01" value="2.70" oninput="calculate()">
+                    </div>
+                </div>
+                <div class="sub-result">Månadskostnad: <span class="res-bank">0</span> kr</div>
+            </div>
+
+            <!-- Försäkring -->
+            <div class="category-box clearfix">
+                <div class="category-title">
+                    <span>🛡️ Försäkring</span>
+                    <button class="btn-add" onclick="addInsuranceRow('opt1', 1200, 0)">+</button>
+                </div>
+                <div class="insurance-list">
+                    <div class="form-row">
+                        <div>
+                            <label>Hemförsäkring (kr/år)</label>
+                            <input type="number" class="ins-cost main-ins" value="3600" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label>Rabatt (%)</label>
+                            <input type="number" class="ins-disc main-ins-disc" value="10" oninput="calculate()">
+                        </div>
+                    </div>
+                </div>
+                <div class="sub-result">Månadskostnad: <span class="res-ins">0</span> kr</div>
+            </div>
+
+            <!-- Larm -->
+            <div class="category-box clearfix">
+                <div class="category-title">🚨 Larm</div>
+                <div class="form-row">
+                    <div>
+                        <label>Månadskostnad (kr)</label>
+                        <input type="number" class="alarm-cost" value="399" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label>Extra rabatt på hemf. (%)</label>
+                        <input type="number" class="alarm-disc" value="5" oninput="calculate()">
+                    </div>
+                </div>
+                <div class="sub-result">Månadskostnad: <span class="res-alarm">0</span> kr</div>
+            </div>
+        </div>
+
+        <!-- ALTERNATIV 2 -->
+        <div class="option-card" id="opt2">
+            <div class="option-title">Alternativ 2</div>
+            
+            <!-- Bank -->
+            <div class="category-box clearfix">
+                <div class="category-title">🏦 Bank</div>
+                <div class="form-row">
+                    <div>
+                        <label>Summa lån (kr)</label>
+                        <input type="number" class="bank-loan" value="3000000" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label>Räntesats (%)</label>
+                        <input type="number" class="bank-rate" step="0.01" value="3.90" oninput="calculate()">
+                    </div>
+                </div>
+                <div class="sub-result">Månadskostnad: <span class="res-bank">0</span> kr</div>
+            </div>
+
+            <!-- Försäkring -->
+            <div class="category-box clearfix">
+                <div class="category-title">
+                    <span>🛡️ Försäkring</span>
+                    <button class="btn-add" onclick="addInsuranceRow('opt2', 1200, 0)">+</button>
+                </div>
+                <div class="insurance-list">
+                    <div class="form-row">
+                        <div>
+                            <label>Hemförsäkring (kr/år)</label>
+                            <input type="number" class="ins-cost main-ins" value="4000" oninput="calculate()">
+                        </div>
+                        <div>
+                            <label>Rabatt (%)</label>
+                            <input type="number" class="ins-disc main-ins-disc" value="0" oninput="calculate()">
+                        </div>
+                    </div>
+                </div>
+                <div class="sub-result">Månadskostnad: <span class="res-ins">0</span> kr</div>
+            </div>
+
+            <!-- Larm -->
+            <div class="category-box clearfix">
+                <div class="category-title">🚨 Larm</div>
+                <div class="form-row">
+                    <div>
+                        <label>Månadskostnad (kr)</label>
+                        <input type="number" class="alarm-cost" value="450" oninput="calculate()">
+                    </div>
+                    <div>
+                        <label>Extra rabatt på hemf. (%)</label>
+                        <input type="number" class="alarm-disc" value="0" oninput="calculate()">
+                    </div>
+                </div>
+                <div class="sub-result">Månadskostnad: <span class="res-alarm">0</span> kr</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="summary-card">
+        <div class="summary-title">📊 Visuell Sammanställning</div>
+        
+        <div class="visual-bar-container">
+            <div class="bar-label">
+                <span>Alternativ 1</span>
+                <span id="label-tot1">0 kr/mån</span>
+            </div>
+            <div class="bar-bg">
+                <div id="bar1" class="bar-fill" style="background-color: var(--primary);"></div>
+            </div>
+
+            <div class="bar-label">
+                <span>Alternativ 2</span>
+                <span id="label-tot2">0 kr/mån</span>
+            </div>
+            <div class="bar-bg">
+                <div id="bar2" class="bar-fill" style="background-color: var(--primary);"></div>
+            </div>
+        </div>
+
+        <div id="comparison-result" class="result-box winner">
+            Räknar ut skillnad...
+        </div>
+    </div>
+</div>
+
+<script>
+    function addInsuranceRow(optionId, cost = 1200, disc = 0) {
+        const container = document.querySelector(`#${optionId} .insurance-list`);
+        const row = document.createElement('div');
+        row.className = 'form-row insurance-row';
+        row.innerHTML = `
+            <div>
+                <label>Extra försäkring (kr/år)</label>
+                <input type="number" class="ins-cost" value="${cost}" oninput="calculate()">
+            </div>
+            <div>
+                <label>Rabatt (%)</label>
+                <input type="number" class="ins-disc" value="${disc}" oninput="calculate()">
+            </div>
+            <button class="btn-delete" onclick="this.parentElement.remove(); calculate();">×</button>
+        `;
+        container.appendChild(row);
+        calculate();
+    }
+
+    function calculateOption(id) {
+        const card = document.getElementById(id);
+        
+        const loan = parseFloat(card.querySelector('.bank-loan').value) || 0;
+        const rate = parseFloat(card.querySelector('.bank-rate').value) || 0;
+        const bankMonthly = (loan * (rate / 100)) / 12;
+        card.querySelector('.res-bank').innerText = Math.round(bankMonthly).toLocaleString('sv-SE');
+
+        const alarmMonthly = parseFloat(card.querySelector('.alarm-cost').value) || 0;
+        const alarmDiscountPercent = parseFloat(card.querySelector('.alarm-disc').value) || 0;
+        card.querySelector('.res-alarm').innerText = Math.round(alarmMonthly).toLocaleString('sv-SE');
+
+        let totalInsuranceMonthly = 0;
+        const insuranceRows = card.querySelectorAll('.insurance-list .form-row');
+        
+        insuranceRows.forEach((row, index) => {
+            const annualCost = parseFloat(row.querySelector('.ins-cost').value) || 0;
+            const discount = parseFloat(row.querySelector('.ins-disc').value) || 0;
+            
+            let monthlyCost = annualCost / 12;
+            
+            if (index === 0) {
+                if (discount > 0) {
+                    monthlyCost = monthlyCost * (1 - (discount / 100));
+                }
+                if (alarmDiscountPercent > 0) {
+                    monthlyCost = monthlyCost * (1 - (alarmDiscountPercent / 100));
+                }
+            } else {
+                if (discount > 0) {
+                    monthlyCost = monthlyCost * (1 - (discount / 100));
+                }
+            }
+            
+            totalInsuranceMonthly += monthlyCost;
+        });
+        
+        card.querySelector('.res-ins').innerText = Math.round(totalInsuranceMonthly).toLocaleString('sv-SE');
+
+        return bankMonthly + alarmMonthly + totalInsuranceMonthly;
+    }
+
+    function getOptionState(id) {
+        const card = document.getElementById(id);
+        const state = {
+            loan: card.querySelector('.bank-loan').value,
+            rate: card.querySelector('.bank-rate').value,
+            alarm: card.querySelector('.alarm-cost').value,
+            alarmDisc: card.querySelector('.alarm-disc').value,
+            ins: []
+        };
+        
+        card.querySelectorAll('.insurance-list .form-row').forEach(row => {
+            state.ins.push({
+                cost: row.querySelector('.ins-cost').value,
+                disc: row.querySelector('.ins-disc').value
+            });
+        });
+        return state;
+    }
+
+    function setOptionState(id, state) {
+        if (!state) return;
+        const card = document.getElementById(id);
+        if(state.loan !== undefined) card.querySelector('.bank-loan').value = state.loan;
+        if(state.rate !== undefined) card.querySelector('.bank-rate').value = state.rate;
+        if(state.alarm !== undefined) card.querySelector('.alarm-cost').value = state.alarm;
+        if(state.alarmDisc !== undefined) card.querySelector('.alarm-disc').value = state.alarmDisc;
+        
+        if (state.ins && state.ins.length > 0) {
+            // Rensa extra rader utöver huvudraden
+            const rows = card.querySelectorAll('.insurance-list .form-row');
+            for(let i = rows.length - 1; i > 0; i--) {
+                rows[i].remove();
+            }
+            
+            // Sätt värde på huvudraden
+            rows[0].querySelector('.ins-cost').value = state.ins[0].cost;
+            rows[0].querySelector('.ins-disc').value = state.ins[0].disc;
+            
+            // Lägg till resterande extra försäkringar
+            for(let i = 1; i < state.ins.length; i++) {
+                addInsuranceRow(id, state.ins[i].cost, state.ins[i].disc);
+            }
+        }
+    }
+
+    function updateShareUrl() {
+        const state = {
+            opt1: getOptionState('opt1'),
+            opt2: getOptionState('opt2')
+        };
+        const jsonStr = JSON.stringify(state);
+        const encodedData = btoa(encodeURIComponent(jsonStr));
+        const shareUrl = window.location.origin + window.location.pathname + '#data=' + encodedData;
+        document.getElementById('share-url').innerText = shareUrl;
+    }
+
+    function copyShareUrl() {
+        const urlText = document.getElementById('share-url').innerText;
+        navigator.clipboard.writeText(urlText).then(() => {
+            alert('Länken har kopierats till urklipp!');
+        }).catch(err => {
+            alert('Kunde inte kopiera automatiskt, kopiera texten manuellt från fältet.');
+        });
+    }
+
+    function calculate() {
+        const tot1 = calculateOption('opt1');
+        const tot2 = calculateOption('opt2');
+
+        document.getElementById('label-tot1').innerText = Math.round(tot1).toLocaleString('sv-SE') + " kr/mån";
+        document.getElementById('label-tot2').innerText = Math.round(tot2).toLocaleString('sv-SE') + " kr/mån";
+
+        const maxTot = Math.max(tot1, tot2, 1);
+        const bar1Percent = (tot1 / maxTot) * 100;
+        const bar2Percent = (tot2 / maxTot) * 100;
+
+        const bar1 = document.getElementById('bar1');
+        const bar2 = document.getElementById('bar2');
+
+        bar1.style.width = bar1Percent + "%";
+        bar2.style.width = bar2Percent + "%";
+
+        if (Math.round(tot1) === Math.round(tot2)) {
+            bar1.style.backgroundColor = "var(--primary)";
+            bar2.style.backgroundColor = "var(--primary)";
+            document.getElementById('comparison-result').className = "result-box";
+            document.getElementById('comparison-result').style.backgroundColor = "#f1f5f9";
+            document.getElementById('comparison-result').style.color = "#1e293b";
+            document.getElementById('comparison-result').innerText = "Alternativen kostar lika mycket!";
+        } else {
+            const diff = Math.abs(tot1 - tot2);
+            const diffYear = diff * 12;
+            
+            if (tot1 < tot2) {
+                bar1.style.backgroundColor = "var(--success)";
+                bar2.style.backgroundColor = "var(--danger)";
+                document.getElementById('comparison-result').className = "result-box winner";
+                document.getElementById('comparison-result').innerText = `🎉 Alternativ 1 är billigare! Du sparar ${Math.round(diff).toLocaleString('sv-SE')} kr i månaden (${Math.round(diffYear).toLocaleString('sv-SE')} kr/år).`;
+            } else {
+                bar1.style.backgroundColor = "var(--danger)";
+                bar2.style.backgroundColor = "var(--success)";
+                document.getElementById('comparison-result').className = "result-box winner";
+                document.getElementById('comparison-result').innerText = `🎉 Alternativ 2 är billigare! Du sparar ${Math.round(diff).toLocaleString('sv-SE')} kr i månaden (${Math.round(diffYear).toLocaleString('sv-SE')} kr/år).`;
+            }
+        }
+        updateShareUrl();
+    }
+
+    // Läs in data från URL vid start om det finns
+    window.addEventListener('DOMContentLoaded', () => {
+        const hash = window.location.hash;
+        if (hash && hash.startsWith('#data=')) {
+            try {
+                const encodedData = hash.substring(6);
+                const jsonStr = decodeURIComponent(atob(encodedData));
+                const state = JSON.parse(jsonStr);
+                
+                setOptionState('opt1', state.opt1);
+                setOptionState('opt2', state.opt2);
+            } catch (e) {
+                console.error("Kunde inte läsa in sparad data från URL:", e);
+            }
+        }
+        calculate();
+    });
+</script>
+
+</body>
+</html>
